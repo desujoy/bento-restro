@@ -1,0 +1,101 @@
+[
+    {
+        "model": "core.fooditem",
+        "pk": 1,
+        "fields": {
+            "name": "Grilled Chicken",
+            "category": 1,
+            "price": 10.99,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 2,
+        "fields": {
+            "name": "Pasta Alfredo",
+            "category": 1,
+            "price": 8.99,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 3,
+        "fields": {
+            "name": "Paneer Butter Masala",
+            "category": 1,
+            "price": 9.49,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 4,
+        "fields": {
+            "name": "Lemonade",
+            "category": 2,
+            "price": 2.49,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 5,
+        "fields": {
+            "name": "Coffee",
+            "category": 2,
+            "price": 3.99,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 6,
+        "fields": {
+            "name": "Green Tea",
+            "category": 2,
+            "price": 1.99,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 7,
+        "fields": {
+            "name": "Caesar Salad",
+            "category": 3,
+            "price": 5.99,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 8,
+        "fields": {
+            "name": "Greek Salad",
+            "category": 3,
+            "price": 6.49,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    },
+    {
+        "model": "core.fooditem",
+        "pk": 9,
+        "fields": {
+            "name": "Fruit Salad",
+            "category": 3,
+            "price": 4.99,
+            "likes_count": 0,
+            "dislikes_count": 0
+        }
+    }
+]
