@@ -1,20 +1,19 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/Auth/Login";
-import Logout from "./components/Auth/Logout";
-import FoodItemList from "./components/FoodItemList";
+import { Routes, Route } from "react-router";
 import OrderForm from "./components/OrderForm";
-import { SignUp } from "./components/Auth/SignUp";
+import HomePage from "./pages/Home";
+import AuthLayout from "./pages/Auth";
+import Login from "./components/Auth/Login";
+import Signup from "./components/Auth/SignUp";
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<FoodItemList />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/order" element={<OrderForm />} />
-        <Route path="/logout" element={<Logout />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/auth" element={<AuthLayout />}>
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
+      </Route>
+      <Route path="/order" element={<OrderForm />} />
+    </Routes>
   );
 }

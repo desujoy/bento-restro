@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { api, setAuthToken } from "../utils/api";
+import { api, setAuthToken } from "../lib/api";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { isAuth } from "@/lib/auth";
 
 interface FoodItem {
   id: number;
@@ -7,10 +18,9 @@ interface FoodItem {
   category: string;
   price: number;
   likes_count: number;
-  dislikes_count: number;
 }
 
-export default function FoodItemList() {
+export default function FoodItemList({ className }: { className?: string }) {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
 
   useEffect(() => {
@@ -22,6 +32,9 @@ export default function FoodItemList() {
   }, []);
 
   const handleLike = async (id: number) => {
+    if (!isAuth()) {
+      window.location.href = "/login";
+    }
     setAuthToken(localStorage.getItem("token"));
     await api.post("/preferences/", { food_item: id, like: true });
     setFoodItems((prev) =>
@@ -32,32 +45,47 @@ export default function FoodItemList() {
   };
 
   const handleDislike = async (id: number) => {
+    if (!isAuth()) {
+      window.location.href = "/login";
+    }
     setAuthToken(localStorage.getItem("token"));
-    await api.post("/preferences/", { food_item: id, like: false });
+    await api.put("/preferences/", { food_item: id, like: false });
     setFoodItems((prev) =>
       prev.map((item) =>
-        item.id === id
-          ? { ...item, dislikes_count: item.dislikes_count + 1 }
-          : item
+        item.id === id ? { ...item, likes_count: item.likes_count - 1 } : item
       )
     );
   };
 
   return (
-    <div>
-      <h2>Food Items</h2>
-      <ul>
+    <div className={cn("space-y-4", className)}>
+      <h2 className="text-2xl font-bold">Food Items</h2>
+      <ul className="flex flex-row flex-wrap gap-4">
         {foodItems.map((item) => (
-          <li key={item.id}>
-            <h3>
-              {item.name} - ${item.price}
-            </h3>
-            <p>
-              Likes: {item.likes_count} | Dislikes: {item.dislikes_count}
-            </p>
-            <button onClick={() => handleLike(item.id)}>Like</button>
-            <button onClick={() => handleDislike(item.id)}>Dislike</button>
-          </li>
+          <Card key={item.id}>
+            <CardHeader>
+              <CardTitle>{item.name}</CardTitle>
+              <CardDescription>{item.category}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Price: ${item.price}</p>
+              <p>Likes: {item.likes_count}</p>
+            </CardContent>
+            <CardFooter className="flex flex-row gap-4">
+              <Button
+                className="bg-green-500"
+                onClick={() => handleLike(item.id)}
+              >
+                Like
+              </Button>
+              <Button
+                variant={"destructive"}
+                onClick={() => handleDislike(item.id)}
+              >
+                Dislike
+              </Button>
+            </CardFooter>
+          </Card>
         ))}
       </ul>
     </div>

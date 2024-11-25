@@ -3,9 +3,11 @@ from .models import FoodItem, UserPreference, Order
 
 
 class FoodItemSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField()
+
     class Meta:
         model = FoodItem
-        fields = ["id", "name", "category", "price", "likes_count", "dislikes_count"]
+        fields = ["id", "name", "category", "price", "likes_count"]
 
 
 class UserPreferenceSerializer(serializers.ModelSerializer):

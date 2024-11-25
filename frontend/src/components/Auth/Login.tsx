@@ -1,44 +1,92 @@
-import React, { useState } from "react";
-import { api, setAuthToken } from "../../utils/api";
+import { api, setAuthToken } from "../../lib/api";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "@/schema/authSchema";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
+import axios from "axios";
+import { useNavigate } from "react-router";
 
-export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+export default function Login({ className }: { className?: string }) {
+  const navigate = useNavigate();
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
-      const response = await api.post("/token/", { username, password });
+      const response = await api.post("/token/", {
+        username: values.username,
+        password: values.password,
+      });
       const { access } = response.data;
-      console.log(access);
       localStorage.setItem("token", access);
       setAuthToken(access);
-      // window.location.href = "/";
-    } catch {
-      setError("Invalid username or password");
+      navigate("/");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status !== 200) {
+          form.setError("password", {
+            message: "Invalid username or password",
+          });
+        }
+      }
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Login</button>
-      </form>
-      {error && <p>{error}</p>}
+    <div
+      className={cn(
+        className,
+        "px-16 py-10 lg:w-[30vw] m-auto bg-slate-200 rounded space-y-8"
+      )}
+    >
+      <h2 className="text-2xl font-semibold">Login</h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="Username" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Submit</Button>
+        </form>
+      </Form>
     </div>
   );
 }

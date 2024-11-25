@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 
 class FoodCategory(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField()
 
     def __str__(self):
         return self.name
@@ -21,9 +20,12 @@ class FoodItem(models.Model):
 
 
 class UserPreference(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
     like = models.BooleanField()
+
+    class Meta:
+        unique_together = ("user", "food_item")
 
 
 class Order(models.Model):

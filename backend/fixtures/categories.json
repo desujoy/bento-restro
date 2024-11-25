@@ -1,0 +1,23 @@
+[
+    {
+        "model": "core.foodcategory",
+        "pk": 1,
+        "fields": {
+            "name": "Main Course"
+        }
+    },
+    {
+        "model": "core.foodcategory",
+        "pk": 2,
+        "fields": {
+            "name": "Beverages"
+        }
+    },
+    {
+        "model": "core.foodcategory",
+        "pk": 3,
+        "fields": {
+            "name": "Salads"
+        }
+    }
+]

@@ -6,8 +6,7 @@
             "name": "Grilled Chicken",
             "category": 1,
             "price": 10.99,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -17,8 +16,7 @@
             "name": "Pasta Alfredo",
             "category": 1,
             "price": 8.99,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -28,8 +26,7 @@
             "name": "Paneer Butter Masala",
             "category": 1,
             "price": 9.49,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -39,8 +36,7 @@
             "name": "Lemonade",
             "category": 2,
             "price": 2.49,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -50,8 +46,7 @@
             "name": "Coffee",
             "category": 2,
             "price": 3.99,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -61,8 +56,7 @@
             "name": "Green Tea",
             "category": 2,
             "price": 1.99,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -72,8 +66,7 @@
             "name": "Caesar Salad",
             "category": 3,
             "price": 5.99,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -83,8 +76,7 @@
             "name": "Greek Salad",
             "category": 3,
             "price": 6.49,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     },
     {
@@ -94,8 +86,7 @@
             "name": "Fruit Salad",
             "category": 3,
             "price": 4.99,
-            "likes_count": 0,
-            "dislikes_count": 0
+            "likes_count": 0
         }
     }
 ]
