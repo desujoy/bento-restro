@@ -1,6 +1,11 @@
 from rest_framework import generics, permissions, status
-from .models import FoodItem, UserPreference, Order
-from .serializers import FoodItemSerializer, UserPreferenceSerializer, OrderSerializer
+from .models import FoodItem, UserPreference, Order, FoodCategory
+from .serializers import (
+    FoodItemSerializer,
+    UserPreferenceSerializer,
+    OrderSerializer,
+    CategorySerializer,
+)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -37,6 +42,11 @@ class SignupView(APIView):
         return Response(
             {"message": "User created successfully"}, status=status.HTTP_201_CREATED
         )
+
+
+class CategoryList(generics.ListAPIView):
+    queryset = FoodCategory.objects.all()
+    serializer_class = CategorySerializer
 
 
 class FoodItemList(generics.ListAPIView):
@@ -83,3 +93,16 @@ class OrderCreate(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         request.data["user"] = request.user.id
         return super().post(request, *args, **kwargs)
+
+
+class SessionView(APIView):
+    def get(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"error": "User is not authenticated"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            {"username": user.username, "email": user.email}, status=status.HTTP_200_OK
+        )

@@ -33,8 +33,9 @@ export default function Login({ className }: { className?: string }) {
         username: values.username,
         password: values.password,
       });
-      const { access } = response.data;
+      const { refresh, access } = response.data;
       localStorage.setItem("token", access);
+      localStorage.setItem("refresh", refresh);
       setAuthToken(access);
       navigate("/");
     } catch (error) {
