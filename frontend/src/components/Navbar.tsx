@@ -2,6 +2,7 @@ import { Link, Outlet } from "react-router";
 import { Button } from "./ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getSession, logout } from "@/lib/auth";
+import { CartButton } from "./CartButton";
 
 export default function Navbar() {
   const queryClient = useQueryClient();
@@ -25,8 +26,9 @@ export default function Navbar() {
           {!isLoading && (
             <>
               {username ? (
-                <p className="text-xl font-bold flex items-center space-x-4 gap-4">
-                  Welcome, {username}{" "}
+                <p className="text-xl font-bold flex items-center gap-4">
+                  Welcome, {username}
+                  <CartButton className="text-xl font-bold bg-blue-500 text-white" />
                   <Button
                     variant={"destructive"}
                     onClick={() => {
@@ -40,6 +42,7 @@ export default function Navbar() {
                 </p>
               ) : (
                 <div className="flex items-center space-x-4">
+                  <CartButton className="text-xl font-bold bg-blue-500 text-white" />
                   <Button
                     variant={"link"}
                     className="text-xl font-bold bg-blue-500 text-white"

@@ -8,10 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "react-router";
 import { getSession } from "@/lib/auth";
 import { useMutation } from "@tanstack/react-query";
 import { setUserPreference } from "@/lib/api";
+import { useAddToCart } from "@/lib/cart";
 
 export interface FoodItemType {
   id: number;
@@ -40,11 +40,20 @@ export default function FoodItem({
       }));
     },
   });
+  const addToCart = useAddToCart();
   const handleLike = async () => {
     if ((await getSession()) === null) {
       window.location.href = "/auth/login";
     }
     mutation.mutate();
+  };
+
+  const handleAddToCart = () => {
+    addToCart.mutate({
+      id: item.id.toString(),
+      name: item.name,
+      quantity: 1,
+    });
   };
 
   return (
@@ -66,8 +75,12 @@ export default function FoodItem({
         >
           {item.liked ? "Dislike" : "Like"}
         </Button>
-        <Button className="bg-blue-500 text-white" variant={"link"}>
-          <Link to={`/order?id=${item.id}`}>Order</Link>
+        <Button
+          className="bg-blue-500 text-white"
+          variant={"link"}
+          onClick={handleAddToCart}
+        >
+          Add to Cart
         </Button>
       </CardFooter>
     </Card>
