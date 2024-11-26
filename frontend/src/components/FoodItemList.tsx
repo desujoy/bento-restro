@@ -1,7 +1,11 @@
 import { cn } from "@/lib/utils";
-import FoodItem, { FoodItemType } from "./FoodItem";
-import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import FoodItem from "./FoodItem";
+import {
+  getFamousFoods,
+  getFoodByCategory,
+  getUserPreferences,
+} from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 export default function FoodItemList({
   header,
@@ -12,26 +16,34 @@ export default function FoodItemList({
   category?: number;
   className?: string;
 }) {
-  const [foodItems, setFoodItems] = useState<FoodItemType[]>([]);
-  useEffect(() => {
-    const fetchFoodItems = async () => {
-      if (category) {
-        const response = await api.get(`/food-items/?category=${category}`);
-        setFoodItems(response.data);
-        return;
-      }
-      const response = await api.get("/food-items/");
-      setFoodItems(response.data);
-    };
-    fetchFoodItems();
-  }, [category]);
+  const {
+    data: foodItems,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["foods", category],
+    queryFn: () => (category ? getFoodByCategory(category) : getFamousFoods()),
+  });
+  const { data: foodPreference } = useQuery({
+    queryKey: ["preferences"],
+    queryFn: getUserPreferences,
+  });
+  if (Array.isArray(foodItems) && Array.isArray(foodPreference)) {
+    foodItems.forEach((item) => {
+      const preference = foodPreference.find(
+        (pref) => pref.food_item === item.id
+      );
+      item.liked = preference ? preference.like : false;
+    });
+  }
   return (
     <div className={cn("space-y-4", className)}>
       <h2 className="text-2xl font-bold">{header}</h2>
       <ul className="flex flex-row gap-4 overflow-x-scroll no-scrollbar">
-        {foodItems.map((item) => (
-          <FoodItem key={item.id} fooditem={item} />
-        ))}
+        {isLoading && <p>Loading...</p>}
+        {error && <p>Error: {error.message}</p>}
+        {Array.isArray(foodItems) &&
+          foodItems.map((item) => <FoodItem key={item.id} fooditem={item} />)}
       </ul>
     </div>
   );

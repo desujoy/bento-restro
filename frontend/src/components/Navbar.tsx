@@ -1,28 +1,15 @@
-import { api, setAuthToken } from "@/lib/api";
-import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router";
 import { Button } from "./ui/button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getSession, logout } from "@/lib/auth";
 
 export default function Navbar() {
-  const [isLoding, setIsLoading] = useState(true);
-  const [isAuth, setIsAuth] = useState(false);
-  const [username, setUsername] = useState("");
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      setAuthToken(localStorage.getItem("token"));
-      api
-        .get("/session/")
-        .then((response) => {
-          setUsername(response.data.username);
-          setIsAuth(true);
-        })
-        .catch((error) => {
-          console.error(error);
-          localStorage.removeItem("token");
-        });
-    }
-    setIsLoading(false);
-  }, []);
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["session"],
+    queryFn: getSession,
+  });
+  const { username } = data || {};
   return (
     <>
       <nav className="flex justify-between items-center bg-slate-900 text-white p-4">
@@ -35,16 +22,16 @@ export default function Navbar() {
           </Link>
         </div>
         <div>
-          {!isLoding && (
+          {!isLoading && (
             <>
-              {isAuth ? (
+              {username ? (
                 <p className="text-xl font-bold flex items-center space-x-4 gap-4">
                   Welcome, {username}{" "}
                   <Button
                     variant={"destructive"}
                     onClick={() => {
-                      localStorage.removeItem("token");
-                      setIsAuth(false);
+                      logout();
+                      queryClient.invalidateQueries({ queryKey: ["session"] });
                     }}
                     className="text-white"
                   >

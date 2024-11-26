@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { api, setAuthToken } from "../lib/api";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -9,8 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { isAuth } from "@/lib/auth";
 import { Link } from "react-router";
+import { getSession } from "@/lib/auth";
+import { useMutation } from "@tanstack/react-query";
+import { setUserPreference } from "@/lib/api";
 
 export interface FoodItemType {
   id: number;
@@ -18,6 +19,7 @@ export interface FoodItemType {
   category: string;
   price: number;
   likes_count: number;
+  liked?: boolean;
 }
 
 export default function FoodItem({
@@ -28,13 +30,21 @@ export default function FoodItem({
   className?: string;
 }) {
   const [item, setItem] = useState<FoodItemType>(fooditem);
-  const handleLike = async (id: number) => {
-    if (!isAuth()) {
-      window.location.href = "/login";
+  const mutation = useMutation({
+    mutationFn: () => setUserPreference(item.id, !item.liked),
+    onSuccess: () => {
+      setItem((prev) => ({
+        ...prev,
+        likes_count: prev.liked ? prev.likes_count - 1 : prev.likes_count + 1,
+        liked: !prev.liked,
+      }));
+    },
+  });
+  const handleLike = async () => {
+    if ((await getSession()) === null) {
+      window.location.href = "/auth/login";
     }
-    setAuthToken(localStorage.getItem("token"));
-    await api.post("/preferences/", { food_item: id, like: true });
-    setItem({ ...item, likes_count: item.likes_count + 1 });
+    mutation.mutate();
   };
 
   return (
@@ -48,8 +58,13 @@ export default function FoodItem({
         <p>Likes: {item.likes_count}</p>
       </CardContent>
       <CardFooter className="flex flex-row gap-4">
-        <Button className="bg-green-500" onClick={() => handleLike(item.id)}>
-          Like
+        <Button
+          className={
+            item.liked ? "bg-red-500 text-white" : "bg-green-500 text-white"
+          }
+          onClick={handleLike}
+        >
+          {item.liked ? "Dislike" : "Like"}
         </Button>
         <Button className="bg-blue-500 text-white" variant={"link"}>
           <Link to={`/order?id=${item.id}`}>Order</Link>

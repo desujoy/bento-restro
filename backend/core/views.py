@@ -61,24 +61,46 @@ class FoodItemList(generics.ListAPIView):
         return queryset
 
 
-class UserPreferenceCreate(generics.CreateAPIView, generics.UpdateAPIView):
+class UserPreferenceCreate(generics.ListCreateAPIView, generics.UpdateAPIView):
     serializer_class = UserPreferenceSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = UserPreference.objects.all()
 
-    def post(self, request, *args, **kwargs):
-        request.data["user"] = request.user.id
-        if UserPreference.objects.filter(
-            user=request.user.id, food_item=request.data["food_item"]
-        ).exists():
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_authenticated:
             return Response(
-                {"error": "UserPreference already exists"},
+                {"error": "User is not authenticated"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        FoodItem.objects.filter(id=request.data["food_item"]).update(
-            likes_count=FoodItem.objects.get(id=request.data["food_item"]).likes_count
-            + 1
+        user_preferences = UserPreference.objects.filter(user=user.id)
+        return Response(
+            UserPreferenceSerializer(user_preferences, many=True).data,
+            status=status.HTTP_200_OK,
         )
+
+    def post(self, request, *args, **kwargs):
+        request.data["user"] = request.user.id
+        userpreference = UserPreference.objects.filter(
+            user=request.user.id, food_item=request.data["food_item"]
+        )
+        if userpreference.exists():
+            userpreference.delete()
+        like = request.data["like"]
+        if like:
+            FoodItem.objects.filter(id=request.data["food_item"]).update(
+                likes_count=FoodItem.objects.get(
+                    id=request.data["food_item"]
+                ).likes_count
+                + 1
+            )
+        else:
+            FoodItem.objects.filter(id=request.data["food_item"]).update(
+                likes_count=FoodItem.objects.get(
+                    id=request.data["food_item"]
+                ).likes_count
+                - 1
+            )
         return super().post(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):

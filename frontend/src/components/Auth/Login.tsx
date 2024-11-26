@@ -1,4 +1,3 @@
-import { api, setAuthToken } from "../../lib/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/schema/authSchema";
@@ -16,6 +15,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { login } from "@/lib/auth";
 
 export default function Login({ className }: { className?: string }) {
   const navigate = useNavigate();
@@ -29,14 +29,7 @@ export default function Login({ className }: { className?: string }) {
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
-      const response = await api.post("/token/", {
-        username: values.username,
-        password: values.password,
-      });
-      const { refresh, access } = response.data;
-      localStorage.setItem("token", access);
-      localStorage.setItem("refresh", refresh);
-      setAuthToken(access);
+      await login(values.username, values.password);
       navigate("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {

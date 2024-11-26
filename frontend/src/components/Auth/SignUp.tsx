@@ -1,4 +1,3 @@
-import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { signUpSchema } from "@/schema/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +15,7 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
+import { register } from "@/lib/auth";
 
 export default function Signup({ className }: { className?: string }) {
   const navigate = useNavigate();
@@ -31,12 +31,12 @@ export default function Signup({ className }: { className?: string }) {
 
   const handleSignUp = async (values: z.infer<typeof signUpSchema>) => {
     try {
-      await api.post("/signup/", {
-        username: values.username,
-        email: values.email,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-      });
+      await register(
+        values.username,
+        values.email,
+        values.password,
+        values.confirmPassword
+      );
       form.reset();
       navigate("/auth/login");
     } catch (error) {
@@ -106,7 +106,11 @@ export default function Signup({ className }: { className?: string }) {
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="Confirm Password" {...field} />
+                  <Input
+                    type="password"
+                    placeholder="Confirm Password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
