@@ -1,15 +1,12 @@
 import { Link, Outlet } from "react-router";
 import { Button } from "./ui/button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getSession, logout } from "@/lib/auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { logout, useSession } from "@/lib/auth";
 import { CartButton } from "./CartButton";
 
 export default function Navbar() {
   const queryClient = useQueryClient();
-  const { data, isLoading } = useQuery({
-    queryKey: ["session"],
-    queryFn: getSession,
-  });
+  const { data, isLoading } = useSession();
   const { username } = data || {};
   return (
     <>

@@ -41,9 +41,26 @@ export async function getCategories() {
   return (await api.get("/categories")).data as CategoryType[];
 }
 
+export async function getOrders() {
+  setAuthToken(getAuthToken());
+  const response = await api.get("/orders/get");
+  if (response.status !== 200) {
+    throw new Error(response.data);
+  }
+  return response.data.orders as {
+    id: number;
+    food_item: number;
+    quantity: number;
+  }[];
+}
+
 export async function getUserPreferences() {
   setAuthToken(getAuthToken());
-  return (await api.get("/preferences")).data as {
+  const response = await api.get("/preferences");
+  if (response.status !== 200) {
+    throw new Error(response.data);
+  }
+  return response.data as {
     id: number;
     user: number;
     food_item: number;
@@ -52,10 +69,13 @@ export async function getUserPreferences() {
 }
 
 export async function setUserPreference(id: number, like: boolean) {
-  setAuthToken(localStorage.getItem("token"));
+  setAuthToken(getAuthToken());
   const response = await api.post("/preferences/", {
     food_item: id,
     like,
   });
+  if (response.status !== 201) {
+    throw new Error(response.data);
+  }
   return response.data;
 }

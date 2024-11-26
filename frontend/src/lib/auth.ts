@@ -1,4 +1,14 @@
+import { QueryClient, useQuery } from "@tanstack/react-query";
 import { api, getAuthToken, setAuthToken } from "./api";
+
+const queryClient = new QueryClient();
+
+export function useSession() {
+  return useQuery({
+    queryKey: ["session"],
+    queryFn: getSession,
+  });
+}
 
 export async function getSession() {
   if (getAuthToken() == null) {
@@ -39,4 +49,7 @@ export async function login(username: string, password: string) {
 export async function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("refresh");
+  queryClient.invalidateQueries({ queryKey: ["session"] });
+  queryClient.invalidateQueries({ queryKey: ["preferencesf"] });
+  window.location.href = "/";
 }

@@ -30,10 +30,13 @@ class UserPreference(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    @property
-    def total_price(self):
-        return self.item.price * self.quantity
+
+class OrderFoodItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ("order", "food_item")

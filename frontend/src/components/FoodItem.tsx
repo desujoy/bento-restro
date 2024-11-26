@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -9,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getSession } from "@/lib/auth";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { setUserPreference } from "@/lib/api";
 import { useAddToCart } from "@/lib/cart";
 
@@ -19,25 +18,23 @@ export interface FoodItemType {
   category: string;
   price: number;
   likes_count: number;
-  liked?: boolean;
 }
 
 export default function FoodItem({
   fooditem,
   className,
+  liked,
 }: {
   fooditem: FoodItemType;
   className?: string;
+  liked?: boolean;
 }) {
-  const [item, setItem] = useState<FoodItemType>(fooditem);
+  const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: () => setUserPreference(item.id, !item.liked),
+    mutationFn: () => setUserPreference(fooditem.id, !liked),
     onSuccess: () => {
-      setItem((prev) => ({
-        ...prev,
-        likes_count: prev.liked ? prev.likes_count - 1 : prev.likes_count + 1,
-        liked: !prev.liked,
-      }));
+      fooditem.likes_count += liked ? -1 : 1;
+      queryClient.invalidateQueries({ queryKey: ["preferences"] });
     },
   });
   const addToCart = useAddToCart();
@@ -50,30 +47,30 @@ export default function FoodItem({
 
   const handleAddToCart = () => {
     addToCart.mutate({
-      id: item.id.toString(),
-      name: item.name,
+      id: fooditem.id.toString(),
+      name: fooditem.name,
       quantity: 1,
     });
   };
 
   return (
-    <Card key={item.id} className={className}>
+    <Card key={fooditem.id} className={className}>
       <CardHeader>
-        <CardTitle>{item.name}</CardTitle>
-        <CardDescription>{item.category}</CardDescription>
+        <CardTitle>{fooditem.name}</CardTitle>
+        <CardDescription>{fooditem.category}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p>Price: ${item.price}</p>
-        <p>Likes: {item.likes_count}</p>
+        <p>Price: ${fooditem.price}</p>
+        <p>Likes: {fooditem.likes_count}</p>
       </CardContent>
       <CardFooter className="flex flex-row gap-4">
         <Button
           className={
-            item.liked ? "bg-red-500 text-white" : "bg-green-500 text-white"
+            liked ? "bg-red-500 text-white" : "bg-green-500 text-white"
           }
           onClick={handleLike}
         >
-          {item.liked ? "Dislike" : "Like"}
+          {liked ? "Dislike" : "Like"}
         </Button>
         <Button
           className="bg-blue-500 text-white"

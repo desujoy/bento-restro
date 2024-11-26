@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import FoodItem, UserPreference, Order, FoodCategory
+from .models import FoodItem, UserPreference, Order, FoodCategory, OrderFoodItem
 
 
 class FoodItemSerializer(serializers.ModelSerializer):
@@ -25,4 +25,10 @@ class UserPreferenceSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["id", "user", "item", "quantity", "total_price", "timestamp"]
+        fields = ["id", "user", "timestamp"]
+
+
+class OrderFoodItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderFoodItem
+        fields = ["id", "order", "food_item", "quantity"]

@@ -1,10 +1,10 @@
 from rest_framework import generics, permissions, status
-from .models import FoodItem, UserPreference, Order, FoodCategory
+from .models import FoodItem, UserPreference, Order, FoodCategory, OrderFoodItem
 from .serializers import (
     FoodItemSerializer,
     UserPreferenceSerializer,
-    OrderSerializer,
     CategorySerializer,
+    OrderSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -108,13 +108,37 @@ class UserPreferenceCreate(generics.ListCreateAPIView, generics.UpdateAPIView):
         return super().put(request, *args, **kwargs)
 
 
-class OrderCreate(generics.CreateAPIView):
-    serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class OrderCreate(APIView):
+    def post(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"error": "User is not authenticated"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        order = Order.objects.create(user=user)
+        for item in request.data:
+            OrderFoodItem.objects.create(
+                order=order, food_item=item["food_item"], quantity=item["quantity"]
+            )
+        return Response(
+            {"message": "Order created successfully"}, status=status.HTTP_201_CREATED
+        )
 
-    def post(self, request, *args, **kwargs):
-        request.data["user"] = request.user.id
-        return super().post(request, *args, **kwargs)
+
+class OrderView(APIView):
+    def get(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"error": "User is not authenticated"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        orders = Order.objects.filter(user=user)
+        return Response(
+            {"orders": OrderSerializer(orders, many=True).data},
+            status=status.HTTP_200_OK,
+        )
 
 
 class SessionView(APIView):

@@ -24,18 +24,12 @@ export default function FoodItemList({
     queryKey: ["foods", category],
     queryFn: () => (category ? getFoodByCategory(category) : getFamousFoods()),
   });
+
   const { data: foodPreference } = useQuery({
     queryKey: ["preferences"],
     queryFn: getUserPreferences,
   });
-  if (Array.isArray(foodItems) && Array.isArray(foodPreference)) {
-    foodItems.forEach((item) => {
-      const preference = foodPreference.find(
-        (pref) => pref.food_item === item.id
-      );
-      item.liked = preference ? preference.like : false;
-    });
-  }
+
   return (
     <div className={cn("space-y-4", className)}>
       <h2 className="text-2xl font-bold">{header}</h2>
@@ -43,7 +37,15 @@ export default function FoodItemList({
         {isLoading && <p>Loading...</p>}
         {error && <p>Error: {error.message}</p>}
         {Array.isArray(foodItems) &&
-          foodItems.map((item) => <FoodItem key={item.id} fooditem={item} />)}
+          foodItems.map((item) => (
+            <FoodItem
+              key={item.id}
+              fooditem={item}
+              liked={
+                foodPreference?.find((pref) => pref.food_item === item.id)?.like
+              }
+            />
+          ))}
       </ul>
     </div>
   );
