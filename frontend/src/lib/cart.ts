@@ -15,7 +15,11 @@ export const useCartItems = () => {
 
 const fetchCartItems = async () => {
   const items = localStorage.getItem("cartItems");
-  return items ? (JSON.parse(items) as CartItemType[]) : [];
+  return items
+    ? (JSON.parse(items) as CartItemType[]).sort(
+        (a: CartItemType, b: CartItemType) => a.name.localeCompare(b.name)
+      )
+    : [];
 };
 
 export const useAddToCart = () => {
@@ -66,4 +70,18 @@ const removeFromCart = async (itemId: string) => {
     const newItems = items.filter((item: CartItemType) => item.id !== itemId);
     localStorage.setItem("cartItems", JSON.stringify(newItems));
   }
+};
+
+export const useClearCart = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: clearCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+    },
+  });
+};
+
+export const clearCart = async () => {
+  return localStorage.removeItem("cartItems");
 };

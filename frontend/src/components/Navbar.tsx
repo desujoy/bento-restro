@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { logout, useSession } from "@/lib/auth";
 import { CartButton } from "./CartButton";
+import { Toaster } from "./ui/toaster";
 
 export default function Navbar() {
   const queryClient = useQueryClient();
@@ -63,6 +64,7 @@ export default function Navbar() {
         </div>
       </nav>
       <Outlet />
+      <Toaster />
     </>
   );
 }

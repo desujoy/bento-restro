@@ -41,19 +41,6 @@ export async function getCategories() {
   return (await api.get("/categories")).data as CategoryType[];
 }
 
-export async function getOrders() {
-  setAuthToken(getAuthToken());
-  const response = await api.get("/orders/get");
-  if (response.status !== 200) {
-    throw new Error(response.data);
-  }
-  return response.data.orders as {
-    id: number;
-    food_item: number;
-    quantity: number;
-  }[];
-}
-
 export async function getUserPreferences() {
   setAuthToken(getAuthToken());
   const response = await api.get("/preferences");

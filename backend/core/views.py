@@ -4,7 +4,6 @@ from .serializers import (
     FoodItemSerializer,
     UserPreferenceSerializer,
     CategorySerializer,
-    OrderSerializer,
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -47,6 +46,10 @@ class SignupView(APIView):
 class CategoryList(generics.ListAPIView):
     queryset = FoodCategory.objects.all()
     serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        queryset = FoodCategory.objects.all()
+        return queryset
 
 
 class FoodItemList(generics.ListAPIView):
@@ -116,10 +119,14 @@ class OrderCreate(APIView):
                 {"error": "User is not authenticated"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        cart = request.data.get("cart")
+        print(cart)
         order = Order.objects.create(user=user)
-        for item in request.data:
+        for item in cart:
             OrderFoodItem.objects.create(
-                order=order, food_item=item["food_item"], quantity=item["quantity"]
+                order=order,
+                food_item=FoodItem.objects.get(id=item["id"]),
+                quantity=item["quantity"],
             )
         return Response(
             {"message": "Order created successfully"}, status=status.HTTP_201_CREATED
@@ -135,10 +142,21 @@ class OrderView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         orders = Order.objects.filter(user=user)
-        return Response(
-            {"orders": OrderSerializer(orders, many=True).data},
-            status=status.HTTP_200_OK,
-        )
+        data = []
+        for order in orders:
+            items = OrderFoodItem.objects.filter(order=order)
+            order_data = {"id": order.id, "items": []}
+            for item in items:
+                order_data["items"].append(
+                    {
+                        "id": item.food_item.id,
+                        "name": item.food_item.name,
+                        "price": item.food_item.price,
+                        "quantity": item.quantity,
+                    }
+                )
+            data.append(order_data)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class SessionView(APIView):

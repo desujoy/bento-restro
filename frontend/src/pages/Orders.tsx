@@ -1,15 +1,7 @@
-import { getOrders } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { useOrders } from "@/lib/order";
 
 export default function OrdersPage() {
-  const {
-    data: orders,
-    error,
-    isLoading,
-  } = useQuery({
-    queryKey: ["orders"],
-    queryFn: getOrders,
-  });
+  const { data: orders, error, isLoading } = useOrders();
 
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto h-full p-4">
@@ -20,8 +12,11 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <li key={order.id} className="flex flex-row gap-4">
               <p>{order.id}</p>
-              <p>{order.food_item}</p>
-              <p>{order.quantity}</p>
+              {order.items.map((item) => (
+                <p key={item.id}>
+                  {item.name} x {item.quantity}
+                </p>
+              ))}
             </li>
           ))}
         </ul>
