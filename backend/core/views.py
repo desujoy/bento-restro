@@ -1,5 +1,12 @@
 from rest_framework import generics, permissions, status
-from .models import FoodItem, UserPreference, Order, FoodCategory, OrderFoodItem
+from .models import (
+    FoodItem,
+    UserPreference,
+    Order,
+    FoodCategory,
+    OrderFoodItem,
+    Recipes,
+)
 from .serializers import (
     FoodItemSerializer,
     UserPreferenceSerializer,
@@ -9,7 +16,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.core.paginator import Paginator
 import re
+import yaml
 
 
 class SignupView(APIView):
@@ -43,13 +52,14 @@ class SignupView(APIView):
         )
 
 
-class CategoryList(generics.ListAPIView):
-    queryset = FoodCategory.objects.all()
-    serializer_class = CategorySerializer
+class CategoryList(APIView):
+    permission_classes = [permissions.AllowAny]
 
-    def get_queryset(self):
-        queryset = FoodCategory.objects.all()
-        return queryset
+    def get(self, request):
+        categories = FoodCategory.objects.all()
+        return Response(
+            CategorySerializer(categories, many=True).data, status=status.HTTP_200_OK
+        )
 
 
 class FoodItemList(generics.ListAPIView):
@@ -120,7 +130,6 @@ class OrderCreate(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         cart = request.data.get("cart")
-        print(cart)
         order = Order.objects.create(user=user)
         for item in cart:
             OrderFoodItem.objects.create(
@@ -141,20 +150,30 @@ class OrderView(APIView):
                 {"error": "User is not authenticated"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        orders = Order.objects.filter(user=user)
+        limit = request.query_params.get("limit", 5)
+        offset = request.query_params.get("offset", 1)
+        orders = Order.objects.filter(user=user).order_by("-timestamp")
+        paginator = Paginator(orders, limit)
+        page = paginator.get_page(offset)
+        orders = page.object_list
         data = []
         for order in orders:
             items = OrderFoodItem.objects.filter(order=order)
             order_data = {"id": order.id, "items": []}
+            total_price = 0
             for item in items:
+                total_price += item.food_item.price * item.quantity
                 order_data["items"].append(
                     {
                         "id": item.food_item.id,
                         "name": item.food_item.name,
                         "price": item.food_item.price,
                         "quantity": item.quantity,
+                        "total": item.food_item.price * item.quantity,
                     }
                 )
+            order_data["total_price"] = total_price
+            order_data["timestamp"] = order.timestamp
             data.append(order_data)
         return Response(data, status=status.HTTP_200_OK)
 
@@ -170,3 +189,40 @@ class SessionView(APIView):
         return Response(
             {"username": user.username, "email": user.email}, status=status.HTTP_200_OK
         )
+
+
+class RecipesView(APIView):
+    def post(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"error": "User is not authenticated"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        recipe = request.data.get("recipe")
+        if not recipe:
+            return Response(
+                {"error": "Recipe file is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        recipe = yaml.safe_load(recipe)
+        if not recipe:
+            return Response(
+                {"error": "Invalid recipe file"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        Recipes.objects.create(user=user, recipe_file=recipe, status="pending")
+        return Response(
+            {"message": "Recipe created successfully"}, status=status.HTTP_201_CREATED
+        )
+
+    def get(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"error": "User is not authenticated"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        recipes = Recipes.objects.filter(user=user)
+        data = []
+        for recipe in recipes:
+            data.append(recipe.recipe_file)
+        return Response(data, status=status.HTTP_200_OK)

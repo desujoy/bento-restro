@@ -40,3 +40,17 @@ class OrderFoodItem(models.Model):
 
     class Meta:
         unique_together = ("order", "food_item")
+
+
+class Recipes(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe_file = models.FileField(upload_to="recipes/", blank=False)
+    statua = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+
+    def __str__(self):
+        return self.recipe_file.name

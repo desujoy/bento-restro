@@ -7,7 +7,7 @@ import { Toaster } from "./ui/toaster";
 
 export default function Navbar() {
   const queryClient = useQueryClient();
-  const { data, isLoading } = useSession();
+  const { data, isError, isLoading } = useSession();
   const { username } = data || {};
   return (
     <>
@@ -16,14 +16,21 @@ export default function Navbar() {
           <Link to="/" className="text-xl font-bold">
             Home
           </Link>
-          <Link to="/order" className="text-xl font-bold">
-            Order
-          </Link>
+          {username && (
+            <>
+              <Link to="/order" className="text-xl font-bold">
+                Your Orders
+              </Link>
+              <Link to="/recipe" className="text-xl font-bold">
+                Your Recipes
+              </Link>
+            </>
+          )}
         </div>
         <div>
           {!isLoading && (
             <>
-              {username ? (
+              {!isError && username ? (
                 <p className="text-xl font-bold flex items-center gap-4">
                   Welcome, {username}
                   <CartButton className="text-xl font-bold bg-blue-500 text-white" />

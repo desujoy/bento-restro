@@ -1,5 +1,5 @@
 import { QueryClient, useQuery } from "@tanstack/react-query";
-import { api, getAuthToken, setAuthToken } from "./api";
+import { api, getAuthToken, removeAuthToken, setAuthToken } from "./api";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +27,7 @@ export async function register(
   password: string,
   confirmPassword: string
 ) {
+  removeAuthToken();
   await api.post("/signup/", {
     username: username,
     email: email,

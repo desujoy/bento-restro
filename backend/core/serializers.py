@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from .models import FoodItem, UserPreference, Order, FoodCategory, OrderFoodItem
+from .models import (
+    FoodItem,
+    UserPreference,
+    Order,
+    FoodCategory,
+    OrderFoodItem,
+    Recipes,
+)
 
 
 class FoodItemSerializer(serializers.ModelSerializer):
@@ -32,3 +39,9 @@ class OrderFoodItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderFoodItem
         fields = ["id", "order", "food_item", "quantity"]
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipes
+        fields = ["id", "user", "recipe_file", "status"]

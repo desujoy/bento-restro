@@ -19,6 +19,10 @@ export const setAuthToken = (token: string | null) => {
   }
 };
 
+export const removeAuthToken = () => {
+  delete api.defaults.headers.common["Authorization"];
+};
+
 export const getAuthToken = () => {
   return localStorage.getItem("token");
 };
@@ -29,15 +33,18 @@ interface CategoryType {
 }
 
 export async function getFamousFoods() {
+  removeAuthToken();
   return (await api.get("/food-items")).data as FoodItemType[];
 }
 
 export async function getFoodByCategory(category: number) {
+  removeAuthToken();
   return (await api.get(`/food-items?category=${category}`))
     .data as FoodItemType[];
 }
 
 export async function getCategories() {
+  removeAuthToken();
   return (await api.get("/categories")).data as CategoryType[];
 }
 

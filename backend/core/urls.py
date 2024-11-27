@@ -17,4 +17,5 @@ urlpatterns = [
     path("orders/get", OrderView.as_view(), name="order-view"),
     path("signup/", SignupView.as_view(), name="signup"),
     path("session/", SessionView.as_view(), name="session"),
+    
 ]

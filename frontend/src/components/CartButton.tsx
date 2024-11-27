@@ -11,14 +11,15 @@ import {
 } from "@/components/ui/sheet";
 import { getSession } from "@/lib/auth";
 import {
+  clearCart,
   useAddToCart,
   useCartItems,
-  useClearCart,
   useRemoveFromCart,
 } from "@/lib/cart";
-import { useCreateOrder } from "@/lib/order";
+import { createOrder } from "@/lib/order";
 import { useToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 export function CartButton({ className }: { className?: string }) {
@@ -26,9 +27,10 @@ export function CartButton({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const addToCart = useAddToCart();
   const removeFromCart = useRemoveFromCart();
-  const createOrder = useCreateOrder();
-  const clearCart = useClearCart();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  console.log(createOrder);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     removeFromCart.mutate(e.target.id);
@@ -56,14 +58,14 @@ export function CartButton({ className }: { className?: string }) {
       name: item.name,
       quantity: item.quantity,
     }));
-    createOrder.mutate(items);
-    if (createOrder.isSuccess) {
-      console.log("Order placed");
-      clearCart.mutate();
-      toast({
-        title: "Order placed",
-      });
-    }
+    await createOrder(items);
+    toast({
+      title: "Order placed",
+      description: "Your order has been placed",
+    });
+    clearCart();
+    queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+    setOpen(false);
   };
 
   return (
