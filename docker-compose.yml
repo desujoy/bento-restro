@@ -11,8 +11,10 @@ services:
       db:
         condition: service_started
     environment:
+      - SECRET_KEY=${SECRET_KEY}
       - DB_PASSWORD=restro
       - DB_HOST=bento-restro-db
+      - FRONTEND_URL=${FRONTEND_URL}
 
   db:
     image: postgres:13
@@ -30,7 +32,7 @@ services:
     depends_on:
       - backend
     environment:
-      - BACKEND_API=http://localhost:8000/api
+      - BACKEND_API=${BACKEND_API}
 
 volumes:
   pgdata:
