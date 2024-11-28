@@ -44,4 +44,4 @@ class OrderFoodItemSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipes
-        fields = ["id", "user", "recipe_file", "status"]
+        fields = ["id", "user", "name", "recipe_file", "status"]

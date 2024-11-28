@@ -27,13 +27,12 @@ export default function Navbar() {
             </>
           )}
         </div>
-        <div>
+        <div className="flex items-center space-x-4">
           {!isLoading && (
             <>
               {!isError && username ? (
                 <p className="text-xl font-bold flex items-center gap-4">
                   Welcome, {username}
-                  <CartButton className="text-xl font-bold bg-blue-500 text-white" />
                   <Button
                     variant={"destructive"}
                     onClick={() => {
@@ -47,7 +46,6 @@ export default function Navbar() {
                 </p>
               ) : (
                 <div className="flex items-center space-x-4">
-                  <CartButton className="text-xl font-bold bg-blue-500 text-white" />
                   <Button
                     variant={"link"}
                     className="text-xl font-bold bg-blue-500 text-white"
@@ -68,6 +66,7 @@ export default function Navbar() {
               )}
             </>
           )}
+          <CartButton className="text-xl font-bold bg-blue-500 text-white" />
         </div>
       </nav>
       <Outlet />

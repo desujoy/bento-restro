@@ -7,10 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getSession } from "@/lib/auth";
+import { useSession } from "@/lib/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { setUserPreference } from "@/lib/api";
 import { useAddToCart } from "@/lib/cart";
+import { useNavigate } from "react-router";
 
 export interface FoodItemType {
   id: number;
@@ -29,7 +30,9 @@ export default function FoodItem({
   className?: string;
   liked?: boolean;
 }) {
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: () => setUserPreference(fooditem.id, !liked),
     onSuccess: () => {
@@ -39,8 +42,8 @@ export default function FoodItem({
   });
   const addToCart = useAddToCart();
   const handleLike = async () => {
-    if ((await getSession()) === null) {
-      window.location.href = "/auth/login";
+    if (!session) {
+      navigate("/auth/login");
     }
     mutation.mutate();
   };

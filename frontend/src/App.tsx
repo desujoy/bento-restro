@@ -6,6 +6,7 @@ import Signup from "./components/Auth/SignUp";
 import Navbar from "./components/Navbar";
 import OrdersPage from "./pages/Orders";
 import Page404 from "./pages/404";
+import RecipesPage from "./pages/Recipes";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Route path="/" element={<Navbar />}>
         <Route index element={<HomePage />} />
         <Route path="order" element={<OrdersPage />} />
+        <Route path="recipe" element={<RecipesPage />} />
         <Route path="*" element={<Page404 />} />
       </Route>
     </Routes>

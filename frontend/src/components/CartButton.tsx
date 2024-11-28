@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { getSession } from "@/lib/auth";
+import { useSession } from "@/lib/auth";
 import {
   clearCart,
   useAddToCart,
@@ -21,14 +21,17 @@ import { useToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 export function CartButton({ className }: { className?: string }) {
   const { data: cartItems, isLoading } = useCartItems();
+  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const addToCart = useAddToCart();
   const removeFromCart = useRemoveFromCart();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   console.log(createOrder);
 
@@ -49,8 +52,8 @@ export function CartButton({ className }: { className?: string }) {
     if (!cartItems) {
       return;
     }
-    if ((await getSession()) === null) {
-      window.location.href = "/auth/login";
+    if (!session) {
+      navigate("/auth/login");
       return;
     }
     const items = cartItems.map((item) => ({
@@ -111,6 +114,15 @@ export function CartButton({ className }: { className?: string }) {
           </ul>
         )}
         <SheetFooter>
+          <Button
+            variant={"destructive"}
+            onClick={() => {
+              clearCart();
+              queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+            }}
+          >
+            Clear Cart
+          </Button>
           <Button className="bg-blue-500 text-white" onClick={handleSubmit}>
             Place Order
           </Button>

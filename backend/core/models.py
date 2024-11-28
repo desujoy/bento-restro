@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
 
 
 class FoodCategory(models.Model):
@@ -49,8 +50,19 @@ class Recipes(models.Model):
         ("rejected", "Rejected"),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     recipe_file = models.FileField(upload_to="recipes/", blank=False)
-    statua = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.recipe_file.name
+        return self.name
+
+    def recipe_download(self):
+        return mark_safe(
+            '<a href="/media/{0}" download>{1}</a>'.format(
+                self.recipe_file, self.recipe_file.name.split("/")[-1]
+            )
+        )
+
+    recipe_download.short_description = "Download Fieldname"

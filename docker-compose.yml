@@ -1,0 +1,36 @@
+services:
+  backend:
+    build: ./backend
+    container_name: bento-restro-backend
+    command: bash start.sh
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./recipes:/app/recipes
+    depends_on:
+      db:
+        condition: service_started
+    environment:
+      - DB_PASSWORD=restro
+      - DB_HOST=bento-restro-db
+
+  db:
+    image: postgres:13
+    container_name: bento-restro-db
+    environment:
+      - POSTGRES_DB=restro_db
+      - POSTGRES_PASSWORD=restro
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_API=http://localhost:8000/api
+
+volumes:
+  pgdata:

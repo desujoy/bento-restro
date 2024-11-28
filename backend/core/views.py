@@ -14,11 +14,11 @@ from .serializers import (
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.core.paginator import Paginator
 import re
-import yaml
 
 
 class SignupView(APIView):
@@ -199,17 +199,22 @@ class RecipesView(APIView):
                 {"error": "User is not authenticated"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        recipe = request.data.get("recipe")
+        recipename = request.data.get("recipe")
+        recipe = request.data.get("file")
         if not recipe:
             return Response(
                 {"error": "Recipe file is required"}, status=status.HTTP_400_BAD_REQUEST
             )
-        recipe = yaml.safe_load(recipe)
-        if not recipe:
+        if recipe.content_type not in [
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ]:
             return Response(
                 {"error": "Invalid recipe file"}, status=status.HTTP_400_BAD_REQUEST
             )
-        Recipes.objects.create(user=user, recipe_file=recipe, status="pending")
+        recipe.name = f"{user.username}_{recipename}.{recipe.name.split('.')[-1]}"
+        Recipes.objects.create(user=user, name=recipename, recipe_file=recipe)
         return Response(
             {"message": "Recipe created successfully"}, status=status.HTTP_201_CREATED
         )
@@ -221,8 +226,20 @@ class RecipesView(APIView):
                 {"error": "User is not authenticated"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        recipes = Recipes.objects.filter(user=user)
+        limit = request.query_params.get("limit", 5)
+        offset = request.query_params.get("offset", 1)
+        recipes = Recipes.objects.filter(user=user).order_by("-timestamp")
+        paginator = Paginator(recipes, limit)
+        page = paginator.get_page(offset)
+        recipes = page.object_list
         data = []
         for recipe in recipes:
-            data.append(recipe.recipe_file)
+            data.append(
+                {
+                    "id": recipe.id,
+                    "recipe": recipe.name,
+                    "status": recipe.status,
+                    "timestamp": recipe.timestamp,
+                }
+            )
         return Response(data, status=status.HTTP_200_OK)
