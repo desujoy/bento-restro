@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { logout, useSession } from "@/lib/auth";
 import { CartButton } from "./CartButton";
 import { Toaster } from "./ui/toaster";
+import { ModeToggle } from "./mode-toggle";
 
 export default function Navbar() {
   const queryClient = useQueryClient();
@@ -11,7 +12,7 @@ export default function Navbar() {
   const { username } = data || {};
   return (
     <>
-      <nav className="flex justify-between items-center bg-slate-900 text-white p-4">
+      <nav className="flex justify-between items-center bg-slate-500 text-white p-4">
         <div className="flex items-center space-x-4">
           <Link to="/" className="text-xl font-bold">
             Home
@@ -67,6 +68,7 @@ export default function Navbar() {
             </>
           )}
           <CartButton className="text-xl font-bold bg-blue-500 text-white" />
+          <ModeToggle />
         </div>
       </nav>
       <Outlet />

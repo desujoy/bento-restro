@@ -1,7 +1,9 @@
 import { FoodItemType } from "@/components/FoodItem";
 import axios from "axios";
 
-const API_BASE_URL = process.env.BACKEND_API || "http://127.0.0.1:8000/api";
+// const API_BASE_URL = process.env.BACKEND_API || "http://127.0.0.1:8000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_BACKEND_API || "http://127.0.0.1:8000/api";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
