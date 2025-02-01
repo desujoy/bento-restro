@@ -2,6 +2,9 @@
 
 A modern and efficient restaurant management system designed to streamline operations for Bento-style restaurants.
 
+## Video Demo
+[![bento-restro video](https://img.youtube.com/vi/RtueEzZhKL0/0.jpg)](https://www.youtube.com/watch?v=RtueEzZhKL0)
+
 ## Features
 
 - **Menu Management**: Easily manage and update your restaurant's menu items
