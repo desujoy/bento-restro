@@ -8,7 +8,7 @@ RUN bun install
 
 RUN bun run build
 
-FROM nginx
+FROM nginx:1.29.4-trixie
 
 COPY --from=0 /app/dist /usr/share/nginx/html
 
